@@ -29,7 +29,7 @@ JavaCodeCommenter helps by:
 
 ## Installation
 
-Build a runnable fat JAR from source (requires JDK 21 and Maven):
+Build a runnable fat JAR from source (requires JDK 17 and Maven):
 
 ```bash
 git clone https://github.com/AmosQuety/JavaCodeCommenter.git
@@ -130,4 +130,3 @@ Built by **Nabasa Amos** (AmosQuety), author of the Python equivalent, [PyCodeCo
 ## License
 
 MIT License.
-# JavaCodeCommenter

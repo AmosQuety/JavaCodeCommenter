@@ -1,5 +1,7 @@
 package com.amosquety.javacodecommenter.model;
 
+import java.util.Objects;
+
 /**
  * Represents a single validation problem found in a method's Javadoc.
  */
@@ -24,10 +26,10 @@ public class ValidationIssue {
      * @param message    a human-readable description of the problem
      */
     public ValidationIssue(String methodName, int lineNumber, Severity severity, String message) {
-        this.methodName = methodName;
+        this.methodName = Objects.requireNonNull(methodName, "methodName");
         this.lineNumber = lineNumber;
-        this.severity = severity;
-        this.message = message;
+        this.severity = Objects.requireNonNull(severity, "severity");
+        this.message = Objects.requireNonNull(message, "message");
     }
 
     /**

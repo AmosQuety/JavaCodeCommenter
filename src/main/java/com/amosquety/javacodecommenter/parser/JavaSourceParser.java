@@ -7,10 +7,11 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.comments.JavadocComment;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Parses a Java source file and extracts method signatures and existing Javadoc.
@@ -27,8 +28,8 @@ public class JavaSourceParser {
      * @throws IOException if the file cannot be read or parsed
      */
     public JavaSourceParser(String filePath) throws IOException {
-        this.filePath = filePath;
-        this.compilationUnit = StaticJavaParser.parse(new File(filePath));
+        this.filePath = Objects.requireNonNull(filePath, "filePath");
+        this.compilationUnit = StaticJavaParser.parse(Path.of(filePath));
     }
 
     /**

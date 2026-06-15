@@ -1,5 +1,7 @@
 package com.amosquety.javacodecommenter.model;
 
+import java.util.Objects;
+
 /**
  * Holds documentation coverage statistics for a file or project.
  */
@@ -17,7 +19,7 @@ public class CoverageReport {
      * @param documentedMethods number of methods with Javadoc
      */
     public CoverageReport(String filePath, int totalMethods, int documentedMethods) {
-        this.filePath = filePath;
+        this.filePath = Objects.requireNonNull(filePath, "filePath");
         this.totalMethods = totalMethods;
         this.documentedMethods = documentedMethods;
     }

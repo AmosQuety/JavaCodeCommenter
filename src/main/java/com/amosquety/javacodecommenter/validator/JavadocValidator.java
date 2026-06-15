@@ -7,6 +7,7 @@ import com.amosquety.javacodecommenter.model.ValidationReport;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Validates existing Javadoc comments against actual method signatures.
@@ -50,11 +51,11 @@ public class JavadocValidator {
             return issues; // no point checking further
         }
 
-        String javadoc = method.getExistingJavadoc();
+        String javadoc = method.getExistingJavadoc().orElse("");
 
         // Check each parameter is documented
         for (String param : method.getParamNames()) {
-            if (!javadoc.contains("@param " + param)) {
+            if (!hasTag(javadoc, "@param", param)) {
                 issues.add(new ValidationIssue(
                         method.getName(),
                         method.getLineNumber(),
@@ -76,7 +77,7 @@ public class JavadocValidator {
 
         // Check @throws for declared exceptions
         for (String ex : method.getThrownExceptions()) {
-            if (!javadoc.contains("@throws " + ex)) {
+            if (!hasTag(javadoc, "@throws", ex)) {
                 issues.add(new ValidationIssue(
                         method.getName(),
                         method.getLineNumber(),
@@ -87,5 +88,22 @@ public class JavadocValidator {
         }
 
         return issues;
+    }
+
+    /**
+     * Checks whether a Javadoc block documents a tag for the exact given name.
+     *
+     * <p>Matching is anchored on a word boundary so that, for example,
+     * {@code @param id} is not satisfied by {@code @param identifier}: the name
+     * must be followed by whitespace or the end of input.
+     *
+     * @param javadoc the Javadoc content to search
+     * @param tag     the Javadoc tag, e.g. {@code @param} or {@code @throws}
+     * @param name    the exact parameter or exception name that must follow the tag
+     * @return {@code true} if the tag documents exactly {@code name}
+     */
+    private boolean hasTag(String javadoc, String tag, String name) {
+        Pattern pattern = Pattern.compile(Pattern.quote(tag) + "\\s+" + Pattern.quote(name) + "(\\s|$)");
+        return pattern.matcher(javadoc).find();
     }
 }

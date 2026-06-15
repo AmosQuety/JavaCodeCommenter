@@ -1,6 +1,8 @@
 package com.amosquety.javacodecommenter.model;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Aggregates all validation issues found in a source file.
@@ -19,8 +21,8 @@ public class ValidationReport {
      * @param totalMethods total number of methods examined
      */
     public ValidationReport(String filePath, List<ValidationIssue> issues, int totalMethods) {
-        this.filePath = filePath;
-        this.issues = issues;
+        this.filePath = Objects.requireNonNull(filePath, "filePath");
+        this.issues = Objects.requireNonNull(issues, "issues");
         this.totalMethods = totalMethods;
     }
 
@@ -36,7 +38,7 @@ public class ValidationReport {
      *
      * @return the validation issues
      */
-    public List<ValidationIssue> getIssues() { return issues; }
+    public List<ValidationIssue> getIssues() { return Collections.unmodifiableList(issues); }
 
     /**
      * Returns the total number of methods examined.
