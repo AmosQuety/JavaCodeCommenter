@@ -7,11 +7,11 @@ import java.util.Objects;
 /**
  * Aggregates all validation issues found in a source file.
  */
-public class ValidationReport {
-
-    private String filePath;
-    private List<ValidationIssue> issues;
-    private int totalMethods;
+public record ValidationReport(
+        String filePath,
+        List<ValidationIssue> issues,
+        int totalMethods
+) {
 
     /**
      * Creates a validation report for a file.
@@ -20,18 +20,10 @@ public class ValidationReport {
      * @param issues       all issues found in the file
      * @param totalMethods total number of methods examined
      */
-    public ValidationReport(String filePath, List<ValidationIssue> issues, int totalMethods) {
-        this.filePath = Objects.requireNonNull(filePath, "filePath");
-        this.issues = Objects.requireNonNull(issues, "issues");
-        this.totalMethods = totalMethods;
+    public ValidationReport {
+        Objects.requireNonNull(filePath, "filePath");
+        Objects.requireNonNull(issues, "issues");
     }
-
-    /**
-     * Returns the path of the validated source file.
-     *
-     * @return the file path
-     */
-    public String getFilePath() { return filePath; }
 
     /**
      * Returns all issues found in the file.
@@ -41,20 +33,13 @@ public class ValidationReport {
     public List<ValidationIssue> getIssues() { return Collections.unmodifiableList(issues); }
 
     /**
-     * Returns the total number of methods examined.
-     *
-     * @return the method count
-     */
-    public int getTotalMethods() { return totalMethods; }
-
-    /**
      * Counts the issues with {@link ValidationIssue.Severity#ERROR} severity.
      *
      * @return the number of error-level issues
      */
     public long getErrorCount() {
         return issues.stream()
-                .filter(i -> i.getSeverity() == ValidationIssue.Severity.ERROR)
+                .filter(i -> i.severity() == ValidationIssue.Severity.ERROR)
                 .count();
     }
 

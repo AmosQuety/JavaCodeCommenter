@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class JavaCodeCommenter {
 
-    private String filePath;
+    private Path filePath;
     private JavaSourceParser parser;
     private List<MethodInfo> methods;
 
@@ -32,7 +32,7 @@ public class JavaCodeCommenter {
      * @return this instance for chaining
      * @throws IOException if the file cannot be read
      */
-    public JavaCodeCommenter fromFile(String filePath) throws IOException {
+    public JavaCodeCommenter fromFile(Path filePath) throws IOException {
         this.filePath = filePath;
         this.parser = new JavaSourceParser(filePath);
         this.methods = parser.extractMethods();
@@ -96,7 +96,7 @@ public class JavaCodeCommenter {
 
         if (inPlace) {
             String updatedSource = generator.insertMissingJavadocs(parser.getCompilationUnit(), methods);
-            Files.writeString(Path.of(filePath), updatedSource);
+            Files.writeString(filePath, updatedSource);
             System.out.println("Updated source file in-place.");
         }
 
@@ -141,8 +141,8 @@ public class JavaCodeCommenter {
         return files.stream()
                 .map(file -> {
                     try {
-                        JavaCodeCommenter commenter = new JavaCodeCommenter().fromFile(file.toString());
-                        return validator.validate(file.toString(), commenter.methods);
+                        JavaCodeCommenter commenter = new JavaCodeCommenter().fromFile(file);
+                        return validator.validate(file, commenter.methods);
                     } catch (IOException e) {
                         throw new IllegalStateException("Failed to validate " + file, e);
                     }
@@ -162,7 +162,7 @@ public class JavaCodeCommenter {
             case "markdown" -> printValidationMarkdown(reports);
             case "text" -> {
                 reports.forEach(ValidationReport::printSummary);
-                long totalMethods = reports.stream().mapToLong(ValidationReport::getTotalMethods).sum();
+                long totalMethods = reports.stream().mapToLong(ValidationReport::totalMethods).sum();
                 long totalErrors = reports.stream().mapToLong(ValidationReport::getErrorCount).sum();
                 System.out.printf("%nProject summary: files=%d | methods=%d | errors=%d%n",
                         reports.size(),
@@ -198,8 +198,8 @@ public class JavaCodeCommenter {
         return files.stream()
                 .map(file -> {
                     try {
-                        JavaCodeCommenter commenter = new JavaCodeCommenter().fromFile(file.toString());
-                        return analyzer.analyze(file.toString(), commenter.methods);
+                        JavaCodeCommenter commenter = new JavaCodeCommenter().fromFile(file);
+                        return analyzer.analyze(file, commenter.methods);
                     } catch (IOException e) {
                         throw new IllegalStateException("Failed to analyze coverage for " + file, e);
                     }
@@ -220,8 +220,8 @@ public class JavaCodeCommenter {
             case "text" -> {
                 reports.forEach(CoverageReport::print);
 
-                int totalMethods = reports.stream().mapToInt(CoverageReport::getTotalMethods).sum();
-                int documentedMethods = reports.stream().mapToInt(CoverageReport::getDocumentedMethods).sum();
+                int totalMethods = reports.stream().mapToInt(CoverageReport::totalMethods).sum();
+                int documentedMethods = reports.stream().mapToInt(CoverageReport::documentedMethods).sum();
                 CoverageReport project = new CoverageReport("PROJECT", totalMethods, documentedMethods);
 
                 System.out.printf("%nProject summary: %d/%d documented (%.1f%%)%n",
@@ -249,12 +249,12 @@ public class JavaCodeCommenter {
             }
 
             json.append("{")
-                    .append("\"filePath\":\"").append(escapeJson(report.getFilePath())).append("\",")
-                    .append("\"totalMethods\":").append(report.getTotalMethods()).append(",")
+                    .append("\"filePath\":\"").append(escapeJson(report.filePath())).append("\",")
+                    .append("\"totalMethods\":").append(report.totalMethods()).append(",")
                     .append("\"errorCount\":").append(report.getErrorCount()).append(",")
                     .append("\"issues\":[");
 
-            List<ValidationIssue> issues = report.getIssues();
+            List<ValidationIssue> issues = report.issues();
             for (int j = 0; j < issues.size(); j++) {
                 ValidationIssue issue = issues.get(j);
                 if (j > 0) {
@@ -262,10 +262,10 @@ public class JavaCodeCommenter {
                 }
 
                 json.append("{")
-                        .append("\"methodName\":\"").append(escapeJson(issue.getMethodName())).append("\",")
-                        .append("\"lineNumber\":").append(issue.getLineNumber()).append(",")
-                        .append("\"severity\":\"").append(issue.getSeverity()).append("\",")
-                        .append("\"message\":\"").append(escapeJson(issue.getMessage())).append("\"")
+                        .append("\"methodName\":\"").append(escapeJson(issue.methodName())).append("\",")
+                        .append("\"lineNumber\":").append(issue.lineNumber()).append(",")
+                        .append("\"severity\":\"").append(issue.severity()).append("\",")
+                        .append("\"message\":\"").append(escapeJson(issue.message())).append("\"")
                         .append("}");
             }
 
@@ -292,9 +292,9 @@ public class JavaCodeCommenter {
             }
 
             json.append("{")
-                    .append("\"filePath\":\"").append(escapeJson(report.getFilePath())).append("\",")
-                    .append("\"totalMethods\":").append(report.getTotalMethods()).append(",")
-                    .append("\"documentedMethods\":").append(report.getDocumentedMethods()).append(",")
+                    .append("\"filePath\":\"").append(escapeJson(report.filePath())).append("\",")
+                    .append("\"totalMethods\":").append(report.totalMethods()).append(",")
+                    .append("\"documentedMethods\":").append(report.documentedMethods()).append(",")
                     .append("\"coveragePercentage\":").append(String.format("%.1f", report.getCoveragePercentage()))
                     .append("}");
         }
@@ -315,16 +315,16 @@ public class JavaCodeCommenter {
         System.out.println("|---|---:|---:|---|---|");
 
         for (ValidationReport report : reports) {
-            if (report.getIssues().isEmpty()) {
-                System.out.printf("| `%s` | - | - | OK | No issues found |%n", report.getFilePath());
+            if (report.issues().isEmpty()) {
+                System.out.printf("| `%s` | - | - | OK | No issues found |%n", report.filePath());
             } else {
-                for (ValidationIssue issue : report.getIssues()) {
+                for (ValidationIssue issue : report.issues()) {
                     System.out.printf("| `%s` | `%s` | %d | %s | %s |%n",
-                            report.getFilePath(),
-                            issue.getMethodName(),
-                            issue.getLineNumber(),
-                            issue.getSeverity(),
-                            issue.getMessage());
+                            report.filePath(),
+                            issue.methodName(),
+                            issue.lineNumber(),
+                            issue.severity(),
+                            issue.message());
                 }
             }
         }
@@ -343,9 +343,9 @@ public class JavaCodeCommenter {
 
         for (CoverageReport report : reports) {
             System.out.printf("| `%s` | %d | %d | %.1f%% |%n",
-                    report.getFilePath(),
-                    report.getDocumentedMethods(),
-                    report.getTotalMethods(),
+                    report.filePath(),
+                    report.documentedMethods(),
+                    report.totalMethods(),
                     report.getCoveragePercentage());
         }
     }

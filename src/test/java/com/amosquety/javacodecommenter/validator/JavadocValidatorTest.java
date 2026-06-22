@@ -4,6 +4,7 @@ import com.amosquety.javacodecommenter.model.MethodInfo;
 import com.amosquety.javacodecommenter.model.ValidationReport;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,7 +31,7 @@ class JavadocValidatorTest {
                 Loads a file.
                 """);
 
-        ValidationReport report = new JavadocValidator().validate("Example.java", List.of(method));
+        ValidationReport report = new JavadocValidator().validate(Path.of("Example.java"), List.of(method));
 
         assertEquals(2, report.getErrorCount());
         assertEquals(3, report.getIssues().size());
@@ -50,7 +51,7 @@ class JavadocValidatorTest {
                 3
         );
 
-        ValidationReport report = new JavadocValidator().validate("Example.java", List.of(method));
+        ValidationReport report = new JavadocValidator().validate(Path.of("Example.java"), List.of(method));
 
         assertEquals(1, report.getErrorCount());
     }
@@ -74,7 +75,7 @@ class JavadocValidatorTest {
                 @return void
                 """);
 
-        ValidationReport report = new JavadocValidator().validate("Example.java", List.of(method));
+        ValidationReport report = new JavadocValidator().validate(Path.of("Example.java"), List.of(method));
 
         assertEquals(0, report.getErrorCount());
     }

@@ -5,6 +5,7 @@ import com.amosquety.javacodecommenter.model.ValidationIssue;
 import com.amosquety.javacodecommenter.model.ValidationIssue.Severity;
 import com.amosquety.javacodecommenter.model.ValidationReport;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -21,14 +22,14 @@ public class JavadocValidator {
      * @param methods  list of parsed methods
      * @return validation report containing all found issues
      */
-    public ValidationReport validate(String filePath, List<MethodInfo> methods) {
+    public ValidationReport validate(Path filePath, List<MethodInfo> methods) {
         List<ValidationIssue> allIssues = new ArrayList<>();
 
         for (MethodInfo method : methods) {
             allIssues.addAll(validateMethod(method));
         }
 
-        return new ValidationReport(filePath, allIssues, methods.size());
+        return new ValidationReport(filePath.toString(), allIssues, methods.size());
     }
 
     /**

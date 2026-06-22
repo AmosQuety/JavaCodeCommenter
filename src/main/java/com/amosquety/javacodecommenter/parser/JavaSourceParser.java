@@ -18,7 +18,7 @@ import java.util.Objects;
  */
 public class JavaSourceParser {
 
-    private String filePath;
+    private Path filePath;
     private CompilationUnit compilationUnit;
 
     /**
@@ -27,9 +27,9 @@ public class JavaSourceParser {
      * @param filePath path to the {@code .java} file to parse
      * @throws IOException if the file cannot be read or parsed
      */
-    public JavaSourceParser(String filePath) throws IOException {
+    public JavaSourceParser(Path filePath) throws IOException {
         this.filePath = Objects.requireNonNull(filePath, "filePath");
-        this.compilationUnit = StaticJavaParser.parse(Path.of(filePath));
+        this.compilationUnit = StaticJavaParser.parse(filePath);
     }
 
     /**
@@ -88,7 +88,7 @@ public class JavaSourceParser {
      *
      * @return the file path
      */
-    public String getFilePath() {
+    public Path getFilePath() {
         return filePath;
     }
 

@@ -5,11 +5,11 @@ import java.util.Objects;
 /**
  * Holds documentation coverage statistics for a file or project.
  */
-public class CoverageReport {
-
-    private String filePath;
-    private int totalMethods;
-    private int documentedMethods;
+public record CoverageReport(
+        String filePath,
+        int totalMethods,
+        int documentedMethods
+) {
 
     /**
      * Creates a coverage report.
@@ -18,32 +18,9 @@ public class CoverageReport {
      * @param totalMethods      total number of methods
      * @param documentedMethods number of methods with Javadoc
      */
-    public CoverageReport(String filePath, int totalMethods, int documentedMethods) {
-        this.filePath = Objects.requireNonNull(filePath, "filePath");
-        this.totalMethods = totalMethods;
-        this.documentedMethods = documentedMethods;
+    public CoverageReport {
+        Objects.requireNonNull(filePath, "filePath");
     }
-
-    /**
-     * Returns the path of the analyzed file.
-     *
-     * @return the file path
-     */
-    public String getFilePath() { return filePath; }
-
-    /**
-     * Returns the total number of methods.
-     *
-     * @return the method count
-     */
-    public int getTotalMethods() { return totalMethods; }
-
-    /**
-     * Returns the number of documented methods.
-     *
-     * @return the documented method count
-     */
-    public int getDocumentedMethods() { return documentedMethods; }
 
     /**
      * Calculates the documentation coverage percentage.

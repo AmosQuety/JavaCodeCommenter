@@ -4,6 +4,7 @@ import com.amosquety.javacodecommenter.model.CoverageReport;
 import com.amosquety.javacodecommenter.model.MethodInfo;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,10 +24,10 @@ class CoverageAnalyzerTest {
 
         MethodInfo undocumented = new MethodInfo("b", List.of(), List.of(), "void", List.of(), 2);
 
-        CoverageReport report = new CoverageAnalyzer().analyze("Example.java", List.of(documented, undocumented));
+        CoverageReport report = new CoverageAnalyzer().analyze(Path.of("Example.java"), List.of(documented, undocumented));
 
-        assertEquals(2, report.getTotalMethods());
-        assertEquals(1, report.getDocumentedMethods());
+        assertEquals(2, report.totalMethods());
+        assertEquals(1, report.documentedMethods());
         assertEquals(50.0, report.getCoveragePercentage());
     }
 
@@ -35,9 +36,9 @@ class CoverageAnalyzerTest {
      */
     @Test
     void analyzeNoMethodsReturnsFullCoverage() {
-        CoverageReport report = new CoverageAnalyzer().analyze("Empty.java", List.of());
+        CoverageReport report = new CoverageAnalyzer().analyze(Path.of("Empty.java"), List.of());
 
-        assertEquals(0, report.getTotalMethods());
+        assertEquals(0, report.totalMethods());
         assertEquals(100.0, report.getCoveragePercentage());
     }
 
@@ -52,7 +53,7 @@ class CoverageAnalyzerTest {
         first.setExistingJavadoc("A.");
         second.setExistingJavadoc("B.");
 
-        CoverageReport report = new CoverageAnalyzer().analyze("Example.java", List.of(first, second));
+        CoverageReport report = new CoverageAnalyzer().analyze(Path.of("Example.java"), List.of(first, second));
 
         assertEquals(100.0, report.getCoveragePercentage());
     }

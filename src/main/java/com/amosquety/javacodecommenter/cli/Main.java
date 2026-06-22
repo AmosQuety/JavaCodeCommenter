@@ -74,7 +74,7 @@ public class Main implements Callable<Integer> {
 
             int totalGenerated = 0;
             for (Path file : files) {
-                totalGenerated += commenter.fromFile(file.toString()).generate(inPlace);
+                totalGenerated += commenter.fromFile(file).generate(inPlace);
             }
 
             System.out.printf("%nProject summary: generated Javadoc for %d method(s) across %d file(s).%n",

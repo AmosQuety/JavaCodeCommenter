@@ -6,6 +6,7 @@ import com.amosquety.javacodecommenter.model.ValidationReport;
 import com.amosquety.javacodecommenter.validator.JavadocValidator;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -72,7 +73,7 @@ class EdgeCaseTest {
                 Opens a connection.
                 """);
 
-        ValidationReport report = new JavadocValidator().validate("Example.java", List.of(method));
+        ValidationReport report = new JavadocValidator().validate(Path.of("Example.java"), List.of(method));
 
         assertEquals(0, report.getErrorCount());
         assertEquals(2, report.getIssues().size());
@@ -88,7 +89,7 @@ class EdgeCaseTest {
                 Shuts the service down.
                 """);
 
-        ValidationReport report = new JavadocValidator().validate("Example.java", List.of(method));
+        ValidationReport report = new JavadocValidator().validate(Path.of("Example.java"), List.of(method));
 
         assertEquals(0, report.getErrorCount());
         assertTrue(report.getIssues().isEmpty());
